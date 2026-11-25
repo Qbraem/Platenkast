@@ -1,31 +1,55 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
 <defs>
- <linearGradient id="w" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a4a2c"/><stop offset=".55" stop-color="#5a3620"/><stop offset="1" stop-color="#3a2214"/></linearGradient>
- <radialGradient id="v" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#2a2420"/><stop offset="1" stop-color="#0f0c0a"/></radialGradient>
- <linearGradient id="sh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/><stop offset=".65" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".12"/></linearGradient>
- <linearGradient id="m" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef0ea"/><stop offset="1" stop-color="#a9a497"/></linearGradient>
- <filter id="ds" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="22" stdDeviation="22" flood-color="#000" flood-opacity=".45"/></filter>
+ <radialGradient id="bg" cx=".5" cy=".35" r=".8"><stop offset="0" stop-color="#3d8780"/><stop offset="1" stop-color="#1f4c48"/></radialGradient>
+ <linearGradient id="w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5532"/><stop offset="1" stop-color="#5a3620"/></linearGradient>
+ <linearGradient id="in" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1e120a"/><stop offset="1" stop-color="#3a2416"/></linearGradient>
+ <filter id="ds" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="26" stdDeviation="24" flood-color="#000" flood-opacity=".45"/></filter>
+ <filter id="s2" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="6" dy="8" stdDeviation="8" flood-color="#000" flood-opacity=".45"/></filter>
 </defs>
-<rect width="1024" height="1024" fill="url(#w)"/>
-<g stroke="#000" stroke-opacity=".10" stroke-width="6" fill="none">
- <path d="M0 120 C300 100 600 150 1024 110"/><path d="M0 260 C350 240 650 290 1024 250"/><path d="M0 420 C280 400 700 450 1024 405"/><path d="M0 600 C320 580 640 630 1024 590"/><path d="M0 780 C300 760 680 810 1024 770"/><path d="M0 930 C340 910 640 960 1024 920"/>
-</g>
-<g stroke="#fff" stroke-opacity=".05" stroke-width="3" fill="none"><path d="M0 190 C320 170 620 220 1024 180"/><path d="M0 510 C330 490 660 540 1024 500"/><path d="M0 860 C310 840 650 890 1024 850"/></g>
+<rect width="1024" height="1024" fill="url(#bg)"/>
+<!-- kast -->
 <g filter="url(#ds)">
- <circle cx="470" cy="540" r="370" fill="url(#v)"/>
+ <rect x="150" y="190" width="724" height="650" rx="22" fill="url(#w)"/>
 </g>
-<g fill="none" stroke="#ffffff" stroke-opacity=".07" stroke-width="3">
- <circle cx="470" cy="540" r="340"/><circle cx="470" cy="540" r="310"/><circle cx="470" cy="540" r="282"/><circle cx="470" cy="540" r="254"/><circle cx="470" cy="540" r="226"/><circle cx="470" cy="540" r="198"/>
+<rect x="150" y="190" width="724" height="10" rx="5" fill="#b07a52" opacity=".7"/>
+<!-- poten -->
+<rect x="210" y="836" width="46" height="70" rx="8" fill="#3a2214"/><rect x="768" y="836" width="46" height="70" rx="8" fill="#3a2214"/>
+<!-- vakken -->
+<rect x="188" y="228" width="314" height="284" rx="8" fill="url(#in)"/>
+<rect x="522" y="228" width="314" height="284" rx="8" fill="url(#in)"/>
+<rect x="188" y="532" width="314" height="270" rx="8" fill="url(#in)"/>
+<rect x="522" y="532" width="314" height="270" rx="8" fill="url(#in)"/>
+<!-- linksboven: ruggen -->
+<g>
+ <rect x="204" y="262" width="22" height="250" fill="#e2a72e"/><rect x="228" y="250" width="16" height="262" fill="#141110"/><rect x="246" y="268" width="26" height="244" fill="#c8532a"/>
+ <rect x="274" y="256" width="14" height="256" fill="#f0e4cb"/><rect x="290" y="262" width="24" height="250" fill="#2f6f6a"/><rect x="316" y="250" width="18" height="262" fill="#7a4a2c"/>
+ <rect x="336" y="266" width="22" height="246" fill="#e2a72e"/><rect x="360" y="254" width="14" height="258" fill="#c8532a"/><rect x="376" y="262" width="26" height="250" fill="#141110"/>
+ <rect x="404" y="270" width="18" height="242" fill="#f0e4cb"/><rect x="424" y="258" width="22" height="254" fill="#5c8f8a"/>
+ <rect x="470" y="262" width="22" height="250" fill="#e2a72e" transform="rotate(-11 470 512)"/>
 </g>
-<circle cx="470" cy="540" r="370" fill="url(#sh)"/>
-<circle cx="470" cy="540" r="150" fill="#c8532a"/>
-<circle cx="470" cy="540" r="150" fill="none" stroke="#e2a72e" stroke-width="16"/>
-<circle cx="470" cy="540" r="112" fill="none" stroke="#e2a72e" stroke-opacity=".55" stroke-width="5"/>
-<circle cx="470" cy="540" r="20" fill="#e8e3d8"/>
-<!-- toonarm -->
-<circle cx="850" cy="190" r="74" fill="#2b2420"/>
-<circle cx="850" cy="190" r="50" fill="url(#m)"/>
-<circle cx="850" cy="190" r="16" fill="#2b2420"/>
-<path d="M850 230 L850 600 L700 760" stroke="url(#m)" stroke-width="30" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#ds)"/>
-<rect x="640" y="735" width="92" height="132" rx="14" fill="#2b2420" transform="rotate(45 686 801)"/>
+<!-- rechtsboven: hoes met plaat -->
+<g filter="url(#s2)">
+ <circle cx="732" cy="378" r="112" fill="#141110"/>
+ <circle cx="732" cy="378" r="38" fill="#c8532a"/><circle cx="732" cy="378" r="7" fill="#f0e4cb"/>
+</g>
+<g fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="3"><circle cx="732" cy="378" r="95"/><circle cx="732" cy="378" r="75"/><circle cx="732" cy="378" r="58"/></g>
+<g filter="url(#s2)" transform="rotate(-4 620 382)">
+ <rect x="540" y="268" width="226" height="226" rx="4" fill="#e2a72e"/>
+ <circle cx="653" cy="381" r="74" fill="#c8532a"/><circle cx="653" cy="381" r="44" fill="#f0e4cb"/>
+ <rect x="560" y="290" width="100" height="14" rx="7" fill="#141110" opacity=".75"/>
+</g>
+<!-- linksonder: ruggen -->
+<g>
+ <rect x="204" y="560" width="18" height="242" fill="#f0e4cb"/><rect x="224" y="552" width="26" height="250" fill="#2f6f6a"/><rect x="252" y="566" width="14" height="236" fill="#e2a72e"/>
+ <rect x="268" y="556" width="22" height="246" fill="#141110"/><rect x="292" y="562" width="20" height="240" fill="#c8532a"/><rect x="314" y="552" width="26" height="250" fill="#f0e4cb"/>
+ <rect x="342" y="568" width="16" height="234" fill="#7a4a2c"/><rect x="360" y="556" width="24" height="246" fill="#e2a72e"/><rect x="386" y="562" width="18" height="240" fill="#2f6f6a"/>
+ <rect x="406" y="552" width="22" height="250" fill="#c8532a"/><rect x="430" y="566" width="18" height="236" fill="#141110"/><rect x="450" y="558" width="24" height="244" fill="#f0e4cb"/>
+</g>
+<!-- rechtsonder: ruggen + schuin -->
+<g>
+ <rect x="538" y="556" width="24" height="246" fill="#c8532a"/><rect x="564" y="566" width="16" height="236" fill="#f0e4cb"/><rect x="582" y="552" width="22" height="250" fill="#141110"/>
+ <rect x="606" y="562" width="26" height="240" fill="#e2a72e"/><rect x="634" y="558" width="18" height="244" fill="#5c8f8a"/><rect x="654" y="568" width="22" height="234" fill="#7a4a2c"/>
+ <rect x="700" y="560" width="26" height="242" fill="#f0e4cb" transform="rotate(-16 700 802)"/>
+ <rect x="742" y="566" width="22" height="236" fill="#2f6f6a" transform="rotate(-16 742 802)"/>
+</g>
 </svg>

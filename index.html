@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Platenkast">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
+<link rel="icon" type="image/png" href="favicon.png?v=2">
 <link rel="manifest" href="manifest.webmanifest">
 <title>Onze platenkast</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,6 +42,7 @@ img{display:block}
 .hero{color:var(--paper);padding:calc(env(safe-area-inset-top) + 18px) max(20px,env(safe-area-inset-right)) 28px max(20px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:18px;
 background:var(--grain),repeating-linear-gradient(92deg,#0000 0 7px,#00000012 7px 9px,#0000 9px 23px,#ffffff08 23px 24px),linear-gradient(170deg,#6b4127,var(--wood) 40%,var(--wood2));
 box-shadow:inset -1px 0 0 #00000040}
+.hero>*{flex:none}
 .top{display:flex;align-items:center;gap:12px}
 .top h1{font:600 24px/1 var(--serif);font-variation-settings:"SOFT" 100,"WONK" 1;margin:0;font-style:italic}
 .top p{margin:4px 0 0;font-size:13px;opacity:.8;display:flex;align-items:center;gap:6px}
@@ -69,10 +70,12 @@ animation:rot 1.8s linear infinite;animation-play-state:paused}
 .led{position:absolute;left:30%;bottom:9%;width:9px;height:9px;border-radius:50%;background:#6a3b23;box-shadow:inset 0 1px 2px #0006}.led.on{background:#ff7a3a;box-shadow:0 0 10px #ff7a3a}
 
 /* de keuze */
-.pick{min-height:150px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
+.pick{min-height:170px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
 .pick>.txt{grid-column:2}.pick>.only{grid-column:1/-1}
 .kick{margin:0 0 2px;font-size:13px;color:var(--mustard);font-weight:700}
-.pick h2{font:600 clamp(24px,6vw,32px)/1.05 var(--serif);margin:0;text-wrap:balance;overflow-wrap:anywhere}
+.pick h2{font:600 clamp(24px,6vw,30px)/1.08 var(--serif);margin:0;text-wrap:balance;overflow-wrap:break-word;hyphens:auto;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
+.pick h2.m{font-size:clamp(20px,5vw,24px)}.pick h2.l{font-size:clamp(17px,4.3vw,20px);line-height:1.15}
+.pa{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .pa{margin:6px 0 0;font-size:17px;opacity:.9}
 .pm{margin:10px 0 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
 .tag{display:inline-flex;align-items:center;padding:2px 10px;border-radius:4px;background:#f4ead31f;border:1px solid #f4ead340;font-size:13px;white-space:nowrap}
@@ -85,6 +88,7 @@ animation:rot 1.8s linear infinite;animation-play-state:paused}
 .sleeve .art:after,.cv:after,.big:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,#0000 52%,#ffffff1c 54%,#0000 57%),linear-gradient(135deg,#ffffff18,#0000 40%,#00000018);mix-blend-mode:soft-light}
 .sleeve.in .art{animation:slide .6s cubic-bezier(.2,.8,.2,1)}
 .sleeve.cyc .inner{transform:none;transition:none}
+@media(min-width:900px){.sleeve{width:136px;margin-inline-end:30px}}
 @keyframes slide{from{transform:translateY(-18px) rotate(-9deg);opacity:0}}
 
 .opts{display:grid;gap:10px;background:#00000026;border:1px solid #f4ead31f;border-radius:12px;padding:14px}
@@ -141,7 +145,7 @@ animation:rot 1.8s linear infinite;animation-play-state:paused}
 .close svg{width:18px;height:18px}
 .big{width:min(100%,340px);margin:4px auto 20px;aspect-ratio:1;border-radius:3px;overflow:hidden;position:relative;background:var(--g,#6b4127);box-shadow:0 18px 36px #3a221460}
 .big img{width:100%;height:100%;object-fit:cover}
-.panel h3{font:600 30px/1.08 var(--serif);margin:0;text-wrap:balance}
+.panel h3{font:600 clamp(22px,6vw,30px)/1.1 var(--serif);margin:0;text-wrap:balance;overflow-wrap:break-word;hyphens:auto;padding-right:40px}
 .panel .ar{font-size:17px;color:var(--mut);margin:4px 0 12px}
 .facts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
 .chip{font-size:13px;padding:3px 10px;border-radius:3px;background:var(--bg);border:1px solid var(--line);white-space:nowrap}
@@ -323,9 +327,10 @@ function sleeve(r,cls){
   const src=r.img||r.thumb;
   return `<button class="sleeve ${cls}" id="sleeve" aria-label="Hoes van ${esc(r.t)}, toon details"><span class="inner"></span><span class="art" style="--g:linear-gradient(150deg,hsl(${hue(r.a+r.t)} 40% 40%),hsl(${(hue(r.a+r.t)+50)%360} 45% 22%))">${src?`<img src="${esc(src)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:''}</span></button>`;
 }
+const tsz=t=>t.length>55?'l':t.length>26?'m':'';
 function showPick(r){
   cur=r;setLabel(r);
-  $('pick').innerHTML=`${sleeve(r,'in')}<div class="txt"><p class="kick">Op de draaitafel</p><h2>${esc(r.t)}</h2><p class="pa">${esc(r.a)}</p>
+  $('pick').innerHTML=`${sleeve(r,'in')}<div class="txt"><p class="kick">Op de draaitafel</p><h2 class="${tsz(r.t)}" title="${esc(r.t)}">${esc(r.t)}</h2><p class="pa">${esc(r.a)}</p>
   <div class="pm"><span class="tag">${esc(owner(r))}</span>${r.y?`<span class="tag">${r.y}</span>`:''}${isX(r)?`<span class="tag x">Kerst</span>`:''}${isD(r)?`<span class="tag x">Disney</span>`:''}
   <button class="lnk" id="more">Details</button><a class="lnk" href="https://www.discogs.com/release/${r.id}" target="_blank" rel="noopener">Op Discogs</a></div></div>`;
   $('more').onclick=$('sleeve').onclick=()=>openSheet(r);
@@ -340,7 +345,7 @@ function shuffle(){
   hist=[target.id,...hist].slice(0,Math.min(12,Math.floor(pool.length/2)));store.set('hist',hist);
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   $('arm').classList.remove('down');$('rec').classList.add('on','fast');$('led').classList.remove('on');
-  const roll=r=>{$('pick').innerHTML=`${sleeve(r,'cyc')}<div class="txt"><p class="kick">Bladeren door de bak…</p><h2></h2></div>`;$('pick').querySelector('h2').textContent=r.t};
+  const roll=r=>{$('pick').innerHTML=`${sleeve(r,'cyc')}<div class="txt"><p class="kick">Bladeren door de bak…</p><h2 class="${tsz(r.t)}"></h2></div>`;$('pick').querySelector('h2').textContent=r.t};
   let n=0;const steps=reduce?1:16;
   (function tick(){
     if(n>=steps){$('rec').classList.remove('fast');busy=false;play(target);renderOpts();return}
