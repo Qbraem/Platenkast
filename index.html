@@ -164,6 +164,24 @@ animation:rot 1.8s linear infinite;animation-play-state:paused}
 .btn.p{background:var(--orange);color:#fff8ec;border-color:var(--orange)}
 
 
+.icon+.icon{margin-inline-start:0}
+.icon.on{background:var(--mustard);color:#2b1c12;border-color:var(--mustard)}
+.adm{display:inline-flex;align-items:center;gap:4px;margin-inline-start:6px;padding:0 7px;border-radius:3px;background:var(--mustard);color:#2b1c12;font-weight:700;font-size:11px}
+.ro{color:var(--mut);font-weight:600}
+.hint{font-size:13px;color:var(--mut);margin:12px 0 0;text-align:center}
+.hint button{background:none;border:0;padding:0;color:inherit;text-decoration:underline;text-underline-offset:3px;font-size:13px}
+.pin{text-align:center;padding:6px 0 4px}
+.pin h3{padding-right:0}
+.dots{display:flex;justify-content:center;gap:16px;margin:18px 0 22px}
+.dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--ink);display:block}
+.dots i.f{background:var(--ink)}
+.dots.bad{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+.pad{display:grid;grid-template-columns:repeat(3,72px);gap:12px;justify-content:center}
+.pad button{height:72px;border-radius:50%;border:1px solid var(--line);background:var(--bg);font:600 26px var(--serif)}
+.pad button:active{background:var(--line)}
+.pad .e{border:0;background:none;font:600 15px var(--font)}
+.err{min-height:22px;color:var(--orange);font-weight:700;font-size:14px;margin:12px 0 0}
 /* kerst */
 .deco{position:absolute;left:-3%;width:106%;pointer-events:none;display:none;z-index:3;overflow:visible}
 .deco.top{top:-5%}.deco.bot{bottom:-6%}
@@ -188,7 +206,8 @@ body.xmas .hero{background:var(--grain),repeating-linear-gradient(92deg,#0000 0 
 <section class="hero" aria-label="Shuffle">
   <header class="top">
     <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#141110"/><circle cx="20" cy="20" r="14" fill="none" stroke="#ffffff22"/><circle cx="20" cy="20" r="10" fill="none" stroke="#ffffff18"/><circle cx="20" cy="20" r="6.5" fill="#e2a72e"/><circle cx="20" cy="20" r="1.6" fill="#141110"/></svg>
-    <div><h1>Onze platenkast</h1><p><span class="dot" id="dot"></span><span id="sync">Verbinden met Discogs…</span></p></div>
+    <div><h1>Onze platenkast</h1><p><span class="dot" id="dot"></span><span id="sync">Verbinden met Discogs…</span><span id="admb"></span></p></div>
+    <button class="icon" id="admin" aria-label="Admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path id="shackle" d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
     <button class="icon" id="refresh" aria-label="Opnieuw ophalen van Discogs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg></button>
   </header>
 
@@ -394,20 +413,69 @@ function shuffle(){
 }
 
 let lastFocus=null;
+const PIN_HASH='843167ad2b7577cfedec3d292d44bab89fecac6bf0e8d3394b5f80840b669be0';
+let admin=store.get('admin',false);
+async function sha(t){
+  if(crypto.subtle){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  return '';
+}
+function setAdmin(on){
+  admin=on;store.set('admin',on);
+  $('admin').classList.toggle('on',on);$('admin').setAttribute('aria-label',on?'Admin: aangemeld, tik om af te melden':'Admin aanmelden');
+  $('shackle').setAttribute('d',on?'M8 11V8a4 4 0 0 1 7.5-2':'M8 11V8a4 4 0 0 1 8 0v3');
+  $('admb').innerHTML=on?'<span class="adm">Admin</span>':'';
+}
+let tries=0,lockUntil=0;
+function openPin(after){
+  lastFocus=lastFocus||document.activeElement;let code='';
+  $('panel').innerHTML=`<div class="grab"></div><button class="close" id="cl" aria-label="Sluiten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  <div class="pin"><h3 id="dt">Admin</h3><p class="ar">Geef de pincode in om de platenkast te beheren.</p>
+  <div class="dots" id="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <div class="pad" id="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-k="${n}">${n}</button>`).join('')}<span></span><button data-k="0">0</button><button class="e" data-k="del" aria-label="Wis">Wis</button></div>
+  <p class="err" id="perr" role="alert"></p></div>`;
+  $('sheet').hidden=false;document.body.style.overflow='hidden';
+  $('cl').onclick=closeSheet;
+  const draw=()=>[...$('dots').children].forEach((d,i)=>d.classList.toggle('f',i<code.length));
+  const press=async k=>{
+    if(Date.now()<lockUntil){$('perr').textContent='Even wachten…';return}
+    if(k==='del'){code=code.slice(0,-1);draw();return}
+    if(code.length>=4)return;code+=k;draw();
+    if(code.length===4){
+      const ok=(await sha('platenkast:'+code))===PIN_HASH;
+      if(ok){tries=0;setAdmin(true);closeSheet();after&&after()}
+      else{tries++;if(tries>=5){lockUntil=Date.now()+30000;tries=0}
+        $('perr').textContent=Date.now()<lockUntil?'Te vaak fout. Probeer over 30 seconden opnieuw.':'Verkeerde pincode';
+        $('dots').classList.remove('bad');void $('dots').offsetWidth;$('dots').classList.add('bad');
+        setTimeout(()=>{code='';draw()},350)}
+    }
+  };
+  $('pad').onclick=e=>{const b=e.target.closest('[data-k]');if(b)press(b.dataset.k)};
+  $('panel').onkeydown=e=>{if(/^\d$/.test(e.key))press(e.key);else if(e.key==='Backspace')press('del')};
+  $('pad').querySelector('button').focus();
+}
+
 function openSheet(r){
-  lastFocus=document.activeElement;
+  lastFocus=lastFocus||document.activeElement;$('panel').onkeydown=null;
   const o=owner(r);
   $('panel').innerHTML=`<div class="grab"></div><button class="close" id="cl" aria-label="Sluiten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   ${cover(r,'big',1)}</div>
   <h3 id="dt">${esc(r.t)}</h3><p class="ar">${esc(r.a)}</p>
   <div class="facts">${r.y?`<span class="chip">${r.y}</span>`:''}${r.lab?`<span class="chip">${esc(r.lab)}</span>`:''}${r.fmt?`<span class="chip">${esc(r.fmt)}</span>`:''}${r.styles.map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</div>
-  <div class="row"><b>Van</b><div class="mini" role="radiogroup" aria-label="Eigenaar" id="ow">${['David','Quinten'].map(p=>`<button role="radio" data-v="${p}" aria-checked="${o===p}">${p}</button>`).join('')}</div></div>
+  ${admin?`<div class="row"><b>Van</b><div class="mini" role="radiogroup" aria-label="Eigenaar" id="ow">${['David','Quinten'].map(p=>`<button role="radio" data-v="${p}" aria-checked="${o===p}">${p}</button>`).join('')}</div></div>
   <div class="row"><b id="xl">Kerstplaat</b><button class="sw" role="switch" id="xs" aria-labelledby="xl" aria-checked="${isX(r)}"></button></div>
-  <div class="row"><b id="dl">Disneyplaat</b><button class="sw" role="switch" id="ds" aria-labelledby="dl" aria-checked="${isD(r)}"></button></div>
-  <div class="acts"><button class="btn p" id="pl">Leg op</button><a class="btn" href="https://www.discogs.com/release/${r.id}" target="_blank" rel="noopener">Op Discogs</a></div>`;
+  <div class="row"><b id="dl">Disneyplaat</b><button class="sw" role="switch" id="ds" aria-labelledby="dl" aria-checked="${isD(r)}"></button></div>`
+  :`<div class="row"><b>Van</b><span class="ro">${esc(o==='Nieuw'?'Nog niet toegewezen':o)}</span></div>
+  <div class="row"><b>Kerstplaat</b><span class="ro">${isX(r)?'Ja':'Nee'}</span></div>
+  <div class="row"><b>Disneyplaat</b><span class="ro">${isD(r)?'Ja':'Nee'}</span></div>`}
+  <div class="acts"><button class="btn p" id="pl">Leg op</button><a class="btn" href="https://www.discogs.com/release/${r.id}" target="_blank" rel="noopener">Op Discogs</a></div>
+  <p class="hint">${admin?'Je bent admin. <button id="lo">Afmelden</button>':'Iets aanpassen? <button id="li">Meld je aan als admin</button>'}</p>`;
   $('sheet').hidden=false;document.body.style.overflow='hidden';$('cl').focus();
   $('cl').onclick=closeSheet;
   $('pl').onclick=()=>{closeSheet();play(r);if(innerWidth<900)scrollTo({top:0,behavior:'smooth'})};
+  const reopen=()=>openSheet(r);
+  if($('lo'))$('lo').onclick=()=>{setAdmin(false);reopen()};
+  if($('li'))$('li').onclick=()=>openPin(reopen);
+  if(!admin)return;
   $('ow').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;
     if(OWNER.get(r.id)===b.dataset.v)delete ownFix[r.id];else ownFix[r.id]=b.dataset.v;store.set('own',ownFix);
     for(const x of $('ow').children)x.setAttribute('aria-checked',x===b);renderAll();if(cur&&cur.id===r.id)showPick(r)};
@@ -416,9 +484,10 @@ function openSheet(r){
   $('xs').onclick=()=>{const v=!isX(r);if(v===r.autoX)delete xmFix[r.id];else xmFix[r.id]=v;store.set('xmfix',xmFix);
     $('xs').setAttribute('aria-checked',v);renderAll();if(cur&&cur.id===r.id)showPick(r)};
 }
-function closeSheet(){$('sheet').hidden=true;document.body.style.overflow='';lastFocus&&lastFocus.focus&&lastFocus.focus()}
+function closeSheet(){$('sheet').hidden=true;document.body.style.overflow='';$('panel').onkeydown=null;const f=lastFocus;lastFocus=null;f&&f.focus&&f.focus()}
 
 $('scrim').onclick=closeSheet;
+$('admin').onclick=()=>{if(admin){setAdmin(false);if(!$('sheet').hidden)closeSheet()}else{lastFocus=$('admin');openPin()}};
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('sheet').hidden)closeSheet()});
 $('grid').onclick=e=>{const b=e.target.closest('[data-id]');if(b){const r=recs.find(x=>x.id===+b.dataset.id);r&&openSheet(r)}};
 $('tabs').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;tab=b.dataset.t;store.set('tab',tab);renderTabs();renderGrid()};
@@ -429,7 +498,7 @@ $('go').onclick=shuffle;$('refresh').onclick=load;
 $('q').oninput=renderGrid;
 const so=store.get('sort','a');$('sort').value=so;$('sort').onchange=()=>{store.set('sort',$('sort').value);renderGrid()};
 $('grid').innerHTML=Array.from({length:12},()=>'<div class="skel"><div class="cv"></div></div>').join('');
-renderOpts();load();
+setAdmin(admin);renderOpts();load();
 }
 </script>
 </body>
