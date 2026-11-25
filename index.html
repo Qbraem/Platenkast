@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1c34c9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Platenkast">
+<title>Onze platenkast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<style>
+/* VOICE: warm, speels, een platenzaak op zaterdag
+   IDEA: de draaitafel + de platenbak van een winkel met kobaltblauwe zakjes
+   PICTURE: een echte draaitafel waarop de gekozen hoes het label wordt
+   COLOUR and TYPE: kobalt, papierwit, roze label-accent; Archivo smal/breed
+   LAYOUT: mobiel gestapeld; breed (Duo open) shuffle links vast, bak rechts */
+:root{color-scheme:light dark;
+--bg:light-dark(#f4f4f1,#0d0f1d);--card:light-dark(#ffffff,#171a30);--ink:light-dark(#12131c,#eef0fb);
+--mut:light-dark(#5d6070,#9ba0c0);--line:light-dark(#e2e2dc,#262a47);
+--blue:#1c34c9;--blue2:#14249a;--pink:#ff4f8b;--paper:#fbfaf6;
+--font:'Archivo',system-ui,-apple-system,sans-serif}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--font);overflow-x:clip;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--pink);outline-offset:3px;border-radius:8px}
+img{display:block}
+
+.layout{display:grid;min-height:100dvh}
+@media(min-width:900px){.layout{grid-template-columns:minmax(360px,440px) minmax(0,1fr)}.hero{position:sticky;top:0;height:100dvh;overflow:auto}}
+
+/* hero */
+.hero{background:var(--blue);color:#fff;padding:calc(env(safe-area-inset-top) + 18px) max(20px,env(safe-area-inset-right)) 28px max(20px,env(safe-area-inset-left));display:flex;flex-direction:column;gap:18px;
+background-image:radial-gradient(120% 70% at 80% 0%,#3a55ff 0,#0000 60%),linear-gradient(var(--blue),var(--blue2))}
+.top{display:flex;align-items:center;gap:12px}
+.top h1{font:800 22px/1 var(--font);font-stretch:112%;margin:0;letter-spacing:-.01em}
+.top p{margin:3px 0 0;font-size:13px;opacity:.8;display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:#ffd34d;flex:none}.dot.ok{background:#5bf0a5}.dot.err{background:var(--pink)}
+.icon{margin-inline-start:auto;width:44px;height:44px;border-radius:50%;border:1px solid #ffffff40;background:#ffffff14;color:#fff;display:grid;place-items:center}
+.icon svg{width:20px;height:20px}.icon.spin svg{animation:rot 1s linear infinite}
+
+.deck{position:relative;aspect-ratio:1.18;width:min(100%,400px);margin:0 auto;border-radius:22px;
+background:linear-gradient(160deg,#2a2d3a,#15161d 60%);box-shadow:0 1px 0 #ffffff26 inset,0 24px 50px #0008}
+.platter{position:absolute;left:6%;top:8%;width:68%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#3b3e4b 0 47%,#24262f 48% 100%);box-shadow:0 6px 18px #0009}
+.rec{position:absolute;inset:3%;border-radius:50%;
+background:repeating-radial-gradient(circle,#0000 0 2px,#ffffff09 2px 3px),conic-gradient(from 30deg,#ffffff1c,#0000 18%,#ffffff12 45%,#0000 65%,#ffffff1c),#101014;
+animation:rot 1.8s linear infinite;animation-play-state:paused}
+.rec.on{animation-play-state:running}.rec.fast{animation-duration:.35s}
+.label{position:absolute;inset:31%;border-radius:50%;overflow:hidden;background:var(--pink);box-shadow:0 0 0 3px #0006}
+.label img{width:100%;height:100%;object-fit:cover}
+.label:after{content:"";position:absolute;left:50%;top:50%;width:9%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:#d9dbe4;box-shadow:0 0 0 2px #0005}
+.arm{position:absolute;right:9%;top:9%;width:13%;height:74%;transform-origin:50% 9%;transform:rotate(-28deg);transition:transform .9s cubic-bezier(.5,0,.2,1)}
+.arm.down{transform:rotate(-3deg)}
+.arm svg{width:100%;height:100%;overflow:visible}
+.knob{position:absolute;right:8%;bottom:9%;width:9%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 35%,#9aa0b5,#3e4150);box-shadow:0 3px 6px #0008}
+.led{position:absolute;left:7%;bottom:8%;width:10px;height:10px;border-radius:50%;background:#3a3d48}.led.on{background:var(--pink);box-shadow:0 0 12px var(--pink)}
+
+.pick{min-height:132px}
+.kick{margin:0 0 2px;font-size:13px;opacity:.75}
+.pick h2{font:800 clamp(26px,6.4vw,36px)/1.05 var(--font);font-stretch:88%;margin:0;text-wrap:balance;overflow-wrap:anywhere}
+.pa{margin:6px 0 0;font-size:17px;opacity:.92}
+.pm{margin:8px 0 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;background:#ffffff22;font-size:13px;white-space:nowrap}
+.tag.x{background:#ffffff;color:var(--blue)}
+.lnk{color:#fff;text-underline-offset:3px;font-size:14px;background:none;border:0;padding:0;text-decoration:underline}
+
+.opts{display:grid;gap:10px}
+.optl{font-size:13px;opacity:.75;margin:0 0 -4px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:#00000030;border-radius:14px;padding:4px;gap:4px}
+.seg button{border:0;background:none;color:#fff;border-radius:10px;min-height:42px;font-weight:600;font-size:15px;padding:0 6px;white-space:nowrap}
+.seg button[aria-checked=true]{background:#fff;color:var(--blue);box-shadow:0 2px 8px #0003}
+.go{margin-top:6px;min-height:58px;border:0;border-radius:18px;background:var(--pink);color:#fff;font:800 19px var(--font);font-stretch:108%;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 10px 24px #ff4f8b55}
+.go:disabled{opacity:.7}.go svg{width:22px;height:22px}
+.pool{text-align:center;font-size:13px;opacity:.75;margin:0}
+
+/* bibliotheek */
+.lib{padding:18px max(16px,env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+@media(min-width:900px){.lib{padding:28px 32px 60px}}
+.libhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.libhead h2{font:800 32px/1.05 var(--font);font-stretch:92%;margin:0}
+.libhead p{margin:0;color:var(--mut);font-size:14px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:14px 0 4px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:1px solid var(--line);background:var(--card);border-radius:99px;min-height:44px;padding:0 16px;font-weight:600;display:flex;align-items:center;gap:8px}
+.tab span{color:var(--mut);font-weight:500}
+.tab[aria-selected=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}.tab[aria-selected=true] span{color:inherit;opacity:.7}
+.tools{display:flex;gap:8px;margin:10px 0 16px;position:sticky;top:0;z-index:4;padding:8px 0;background:var(--bg)}
+.tools input,.tools select{min-height:46px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:0 14px;font-size:16px}
+.tools input{flex:1}.tools select{flex:none;max-width:44%}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(150px,42vw),1fr));gap:20px 14px}
+.it{all:unset;cursor:pointer;display:block;border-radius:8px}
+.it:focus-visible{outline:3px solid var(--pink);outline-offset:4px}
+.cv{position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;background:var(--g,#333);box-shadow:0 8px 18px #0000002a;transition:transform .2s}
+.it:hover .cv{transform:translateY(-3px)}
+.cv img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cv .ph{position:absolute;inset:0;padding:12px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;font-weight:700;font-size:14px;line-height:1.15}
+.cv .ph small{font-weight:500;opacity:.8;font-size:12px}
+.badge{position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:50%;background:#fff;color:#c21d4f;display:grid;place-items:center;box-shadow:0 2px 6px #0004}
+.badge.d{color:#1c34c9}.badge svg{width:15px;height:15px}
+.own{position:absolute;left:7px;bottom:7px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:#ffffffe6;color:#12131c}
+.cap{margin-top:8px;font-size:14px;line-height:1.25;font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cap2{font-size:13px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{grid-column:1/-1;padding:40px 10px;text-align:center;color:var(--mut)}
+.skel .cv{background:var(--line);animation:pulse 1.2s ease-in-out infinite alternate;box-shadow:none}
+.note{color:var(--mut);font-size:13px;margin-top:28px}
+.note a{color:inherit}
+
+/* detailblad */
+.sheet{position:fixed;inset:0;z-index:20;display:grid;align-items:end;justify-items:center}
+.sheet[hidden]{display:none}
+.scrim{position:absolute;inset:0;background:#05061099;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.panel{position:relative;width:min(100%,560px);max-height:92dvh;overflow:auto;background:var(--card);border-radius:24px 24px 0 0;padding:14px 20px calc(24px + env(safe-area-inset-bottom));animation:up .28s cubic-bezier(.2,.8,.2,1)}
+@media(min-width:700px){.sheet{align-items:center}.panel{border-radius:24px;padding-bottom:24px}}
+.grab{width:44px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 14px}
+.close{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;border:0;background:var(--bg);display:grid;place-items:center}
+.close svg{width:18px;height:18px}
+.big{width:min(100%,340px);margin:4px auto 18px;aspect-ratio:1;border-radius:8px;overflow:hidden;position:relative;background:var(--g,#333);box-shadow:0 18px 40px #0004}
+.big img{width:100%;height:100%;object-fit:cover}
+.panel h3{font:800 28px/1.08 var(--font);font-stretch:90%;margin:0;text-wrap:balance}
+.panel .ar{font-size:17px;color:var(--mut);margin:4px 0 12px}
+.facts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.chip{font-size:13px;padding:4px 10px;border-radius:99px;background:var(--bg);border:1px solid var(--line);white-space:nowrap}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.row b{font-weight:600}
+.mini{display:flex;background:var(--bg);border-radius:12px;padding:3px;gap:3px}
+.mini button{border:0;background:none;border-radius:9px;min-height:40px;padding:0 14px;font-weight:600}
+.mini button[aria-checked=true]{background:var(--ink);color:var(--bg)}
+.sw{width:54px;height:32px;border-radius:99px;border:0;background:var(--line);position:relative;flex:none}
+.sw:after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 4px #0004;transition:transform .2s}
+.sw[aria-checked=true]{background:var(--pink)}.sw[aria-checked=true]:after{transform:translateX(22px)}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.btn{min-height:50px;border-radius:14px;border:1px solid var(--line);background:var(--bg);font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--ink)}
+.btn.p{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+@keyframes rot{to{transform:rotate(360deg)}}
+@keyframes pulse{to{opacity:.45}}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+@media(prefers-reduced-motion:reduce){.rec{animation:none}.arm{transition:none}.panel{animation:none}}
+</style>
+</head>
+<body>
+<div class="layout">
+<section class="hero" aria-label="Shuffle">
+  <header class="top">
+    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#0d0e14"/><circle cx="20" cy="20" r="14" fill="none" stroke="#ffffff22"/><circle cx="20" cy="20" r="10" fill="none" stroke="#ffffff18"/><circle cx="20" cy="20" r="6.5" fill="#ff4f8b"/><circle cx="20" cy="20" r="1.6" fill="#fff"/></svg>
+    <div><h1>Onze platenkast</h1><p><span class="dot" id="dot"></span><span id="sync">Verbinden met Discogs…</span></p></div>
+    <button class="icon" id="refresh" aria-label="Opnieuw ophalen van Discogs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg></button>
+  </header>
+
+  <div class="deck" aria-hidden="true">
+    <div class="platter"><div class="rec" id="rec"><div class="label" id="label"></div></div></div>
+    <div class="arm" id="arm"><svg viewBox="0 0 40 300" preserveAspectRatio="none"><circle cx="20" cy="22" r="17" fill="#b9bdcc"/><circle cx="20" cy="22" r="7" fill="#5a5e6e"/><path d="M20 30 L20 240 L8 282" stroke="#d6d9e4" stroke-width="6" fill="none" stroke-linecap="round"/><rect x="0" y="272" width="16" height="26" rx="3" fill="#ff4f8b" transform="rotate(20 8 285)"/></svg></div>
+    <div class="knob"></div><div class="led" id="led"></div>
+  </div>
+
+  <div class="pick" id="pick" aria-live="polite">
+    <p class="kick">Shuffle</p>
+    <h2>Wat leggen we op?</h2>
+    <p class="pa">Kies van wie, beslis over kerst, en laat de kast kiezen.</p>
+  </div>
+
+  <div class="opts">
+    <p class="optl" id="lw">Van wie</p>
+    <div class="seg" role="radiogroup" aria-labelledby="lw" id="segWho">
+      <button role="radio" data-v="all">Allebei</button><button role="radio" data-v="David">David</button><button role="radio" data-v="Quinten">Quinten</button>
+    </div>
+    <p class="optl" id="lx">Kerst</p>
+    <div class="seg" role="radiogroup" aria-labelledby="lx" id="segX">
+      <button role="radio" data-v="no">Geen kerst</button><button role="radio" data-v="only">Alleen kerst</button><button role="radio" data-v="any">Mag ook</button>
+    </div>
+    <p class="optl" id="ld">Disney</p>
+    <div class="seg" role="radiogroup" aria-labelledby="ld" id="segD">
+      <button role="radio" data-v="no">Geen Disney</button><button role="radio" data-v="only">Alleen Disney</button><button role="radio" data-v="any">Mag ook</button>
+    </div>
+    <button class="go" id="go" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>Kies een plaat</button>
+    <p class="pool" id="pool"></p>
+  </div>
+</section>
+
+<main class="lib">
+  <div class="libhead"><h2>De platenbak</h2><p id="sum"></p></div>
+  <nav class="tabs" role="tablist" id="tabs" aria-label="Onderverdeling"></nav>
+  <div class="tools">
+    <input id="q" type="search" placeholder="Zoek artiest, titel of label" aria-label="Zoek in de collectie" autocomplete="off">
+    <select id="sort" aria-label="Sorteren">
+      <option value="a">Artiest A–Z</option><option value="t">Titel A–Z</option><option value="new">Laatst toegevoegd</option><option value="y">Jaar, oudste eerst</option><option value="yd">Jaar, nieuwste eerst</option>
+    </select>
+  </div>
+  <div class="grid" id="grid"></div>
+  <p class="note">Live uit de Discogs-collectie van <a href="https://www.discogs.com/user/Qbraem/collection">Qbraem</a>. Nieuwe platen verschijnen vanzelf; wijs ze in het detailblad toe aan David of Quinten.</p>
+</main>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="scrim" id="scrim"></div>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="dt" id="panel"></div>
+</div>
+
+<script>
+{
+const USER='Qbraem';
+// Mappen op Discogs (privé via de API), vastgelegd op 25 nov 2026
+const DAVID=[368899,543602,902875,941672,1247183,1358955,1860691,2032233,2460636,2622471,2632942,3601096,3716880,3945766,4486286,5059127,5487018,5689035,7656262,7697036,7748058,9279267,9335543,9370710,9547721,9713132,10339805,11148582,11557309,11788386,11960110,12233641,12295534,12306814,12419338,12634808,12648124,12779785,12886698,12931983,13426174,13475097,13731111,14160408,14405634,14432136,14513771,14552957,14553916,14574993,15016865,15413660,15423284,16319955,17269210,20231599,20439736,20507551,20588200,21024442,21863953,22640816,22932908,23285822,24746456,25028575,25049404,26121791,26204687,26777999,28593214,28959301,31875026,33338333,34950851,35207368,35271787,38175492];
+const QUINTEN=[32530,632402,1007359,1244247,1547633,1569981,1579384,1649087,2081382,2197266,2298220,2485033,2567790,2704524,2751373,2758775,3120161,3129886,3173223,3214616,3309624,3875025,4003756,4137731,4423483,4717883,4723572,4805101,4881614,4905144,4910802,4956257,5444270,5497470,5576799,5877828,6152967,6326382,6379963,6398816,6827953,7033780,7305353,7977439,8319343,8543088,9022889,9329727,9360593,10654633,11333055,11426525,11527182,13455303,13752134,13952853,14793082,15477738,15796843,16003815,16209007,17590309,17991814,19437493,21112723,21224689,24606521,24893972,25892809,27804660,28639966,30571729,32395638,32555853,34321045,35382589,35405605,36450621,38311821,38313078,38328099,38830068];
+const OWNER=new Map([...DAVID.map(i=>[i,'David']),...QUINTEN.map(i=>[i,'Quinten'])]);
+const DIS_T=/disney|epcot|fantasmic|figment|mary poppins|jungle ?boek|jungle book|magic kingdom|imagineer/i;
+const DIS_L=/walt disney|disneyland|buena vista records|disney/i;
+const XM=/christmas|kerst|xmas|x-mas|crissmas|no[eë]l\b|navidad|weihnacht|santa|jingle|winter wonderland|sleigh|mistletoe/i;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store={get(k,d){try{const v=localStorage.getItem('pk.'+k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{localStorage.setItem('pk.'+k,JSON.stringify(v))}catch{}}};
+const clean=s=>String(s||'').replace(/\s*\(\d+\)$/,'').trim();
+const hue=s=>{let h=5381;for(const c of s)h=(h*33+c.charCodeAt(0))>>>0;return h%360};
+const icoStar='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.6 6.2 6.7.6-5.1 4.4 1.6 6.5L12 16.7l-5.8 3.5 1.6-6.5-5.1-4.4 6.7-.6z"/></svg>';
+const icoSnow='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v20M4.9 6.5l14.2 11M19.1 6.5 4.9 17.5M9 3.5l3 2.5 3-2.5M9 20.5l3-2.5 3 2.5"/></svg>';
+
+let recs=[],tab=store.get('tab','all'),who=store.get('who','all'),busy=false,cur=null;
+const now=new Date();
+let xm=store.get('xm',(now.getMonth()===11||(now.getMonth()===10&&now.getDate()>=15))?'any':'no');
+let dm=store.get('dm','any'),dFix=store.get('dfix',{});
+let ownFix=store.get('own',{}),xmFix=store.get('xmfix',{}),hist=store.get('hist',[]);
+
+function shape(r){
+  const b=r.basic_information,a=b.artists||[];
+  const artist=a.map((x,i)=>clean(x.anv||x.name)+(i<a.length-1?(x.join&&x.join!==','?' '+x.join+' ':', '):'')).join('');
+  const f=(b.formats||[])[0]||{};
+  const fmt=[(+f.qty>1?f.qty+'× ':'')+(f.name||''),...(f.descriptions||[]),f.text].filter(Boolean).join(' · ');
+  const styles=[...(b.genres||[]),...(b.styles||[])];
+  return {id:b.id,t:b.title,a:artist,y:b.year||0,lab:clean((b.labels||[])[0]?.name),fmt,styles,
+    img:b.cover_image&&!/spacer/.test(b.cover_image)?b.cover_image:'',thumb:b.thumb||'',added:r.date_added||'',
+    autoX:XM.test(b.title+' '+artist)||styles.includes('Holiday'),
+    autoD:DIS_T.test(b.title+' '+artist)||(b.labels||[]).some(l=>DIS_L.test(l.name||''))};
+}
+const owner=r=>ownFix[r.id]||OWNER.get(r.id)||'Nieuw';
+const isX=r=>r.id in xmFix?xmFix[r.id]:r.autoX;
+const isD=r=>r.id in dFix?dFix[r.id]:!!r.autoD;
+
+async function load(){
+  setSync('Ophalen van Discogs…','');$('refresh').classList.add('spin');
+  try{
+    let out=[],page=1,pages=1;
+    do{
+      const res=await fetch(`https://api.discogs.com/users/${USER}/collection/folders/0/releases?per_page=100&page=${page}&sort=added&sort_order=desc`);
+      if(!res.ok)throw new Error(res.status);
+      const j=await res.json();out=out.concat(j.releases||[]);pages=j.pagination?.pages||1;page++;
+    }while(page<=pages);
+    const seen=new Set();recs=out.map(shape).filter(r=>!seen.has(r.id)&&seen.add(r.id));
+    store.set('cache',{at:Date.now(),recs});
+    setSync(`Live met Discogs · ${recs.length} platen`,'ok');
+  }catch(e){
+    const c=store.get('cache',null);
+    if(c&&c.recs?.length){recs=c.recs;setSync('Offline: laatst opgehaald '+new Date(c.at).toLocaleDateString('nl-BE'),'err')}
+    else{recs=[];setSync('Discogs niet bereikbaar','err');$('grid').innerHTML='<p class="empty">Discogs antwoordt nu niet. Tik op het pijltje bovenaan om het opnieuw te proberen.</p>'}
+  }
+  $('refresh').classList.remove('spin');
+  if(recs.length){renderAll();if(!cur){const r=recs[Math.floor(Math.random()*recs.length)];setLabel(r)}}
+}
+function setSync(t,s){$('sync').textContent=t;$('dot').className='dot '+s}
+
+function cover(r,cls='cv',big){
+  const src=big?r.img||r.thumb:r.img||r.thumb;
+  return `<div class="${cls}" style="--g:linear-gradient(150deg,hsl(${hue(r.a+r.t)} 55% 42%),hsl(${(hue(r.a+r.t)+50)%360} 60% 22%))"><div class="ph">${esc(r.t)}<small>${esc(r.a)}</small></div>${src?`<img src="${esc(src)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">`:''}`;
+}
+const inTab=(r,t)=>t==='all'||(t==='xmas'?isX(r):t==='disney'?isD(r):owner(r)===t);
+function list(){
+  const q=$('q').value.trim().toLowerCase(),s=$('sort').value;
+  const col=new Intl.Collator('nl',{sensitivity:'base'});
+  return recs.filter(r=>inTab(r,tab)&&(!q||(r.a+' '+r.t+' '+r.lab).toLowerCase().includes(q))).sort((x,y)=>
+    s==='t'?col.compare(x.t,y.t):s==='y'?(x.y||9999)-(y.y||9999):s==='yd'?(y.y||0)-(x.y||0):s==='new'?y.added.localeCompare(x.added):col.compare(x.a.replace(/^the /i,''),y.a.replace(/^the /i,'')));
+}
+function renderTabs(){
+  const n=t=>recs.filter(r=>inTab(r,t)).length;
+  const tabs=[['all','Alles'],['David','David'],['Quinten','Quinten'],['xmas','Kerst'],['disney','Disney']];
+  const nw=recs.filter(r=>owner(r)==='Nieuw').length;if(nw)tabs.push(['Nieuw','Nog toe te wijzen']);
+  if(!tabs.some(t=>t[0]===tab))tab='all';
+  $('tabs').innerHTML=tabs.map(([v,l])=>`<button class="tab" role="tab" data-t="${v}" aria-selected="${v===tab}">${l}<span>${n(v)}</span></button>`).join('');
+  const d=n('David'),qn=n('Quinten');
+  $('sum').textContent=`${recs.length} platen · ${d} van David · ${qn} van Quinten`;
+}
+function renderGrid(){
+  const v=list();
+  $('grid').innerHTML=v.length?v.map(r=>`<button class="it" data-id="${r.id}" aria-label="${esc(r.t)} van ${esc(r.a)}">${cover(r)}${isX(r)?`<span class="badge" title="Kerst">${icoSnow}</span>`:isD(r)?`<span class="badge d" title="Disney">${icoStar}</span>`:''}${tab==='all'||tab==='xmas'||tab==='disney'?`<span class="own">${esc(owner(r))}</span>`:''}</div><div class="cap">${esc(r.t)}</div><div class="cap2">${esc(r.a)}${r.y?' · '+r.y:''}</div></button>`).join('')
+    :'<p class="empty">Geen platen gevonden. Probeer een andere zoekterm of tab.</p>';
+}
+function shufflePool(){return recs.filter(r=>(who==='all'||owner(r)===who)&&(xm==='any'||(xm==='only'?isX(r):!isX(r)))&&(dm==='any'||(dm==='only'?isD(r):!isD(r))))}
+function renderOpts(){
+  for(const [id,val] of [['segWho',who],['segX',xm],['segD',dm]])for(const b of $(id).children)b.setAttribute('aria-checked',b.dataset.v===val);
+  const n=shufflePool().length;
+  $('pool').textContent=recs.length?(n?`${n} ${n===1?'plaat':'platen'} in de shuffle`:'Geen platen voor deze keuze'):'';
+  $('go').disabled=!n||busy;
+}
+function renderAll(){renderTabs();renderGrid();renderOpts()}
+
+function setLabel(r){$('label').innerHTML=r&&(r.thumb||r.img)?`<img src="${esc(r.thumb||r.img)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:''}
+function showPick(r){
+  cur=r;setLabel(r);
+  $('pick').innerHTML=`<p class="kick">Op de draaitafel</p><h2>${esc(r.t)}</h2><p class="pa">${esc(r.a)}</p>
+  <div class="pm"><span class="tag">${esc(owner(r))}</span>${r.y?`<span class="tag">${r.y}</span>`:''}${isX(r)?`<span class="tag x">Kerst</span>`:''}${isD(r)?`<span class="tag x">Disney</span>`:''}
+  <button class="lnk" id="more">Details</button><a class="lnk" href="https://www.discogs.com/release/${r.id}" target="_blank" rel="noopener">Op Discogs</a></div>`;
+  $('more').onclick=()=>openSheet(r);
+}
+function play(r){
+  $('rec').classList.add('on');$('arm').classList.add('down');$('led').classList.add('on');showPick(r);
+}
+function shuffle(){
+  const pool=shufflePool();if(busy||!pool.length)return;busy=true;renderOpts();
+  const fresh=pool.filter(r=>!hist.includes(r.id));const from=fresh.length?fresh:pool;
+  const target=from[Math.floor(Math.random()*from.length)];
+  hist=[target.id,...hist].slice(0,Math.min(12,Math.floor(pool.length/2)));store.set('hist',hist);
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('arm').classList.remove('down');$('rec').classList.add('on','fast');$('led').classList.remove('on');
+  $('pick').innerHTML='<p class="kick">Zoeken in de bak…</p><h2>&nbsp;</h2>';
+  let n=0;const steps=reduce?1:16;
+  (function tick(){
+    if(n>=steps){$('rec').classList.remove('fast');busy=false;play(target);renderOpts();return}
+    const r=pool[Math.floor(Math.random()*pool.length)];setLabel(r);$('pick').querySelector('h2').textContent=r.t;
+    n++;setTimeout(tick,50+n*n*2.2);
+  })();
+}
+
+let lastFocus=null;
+function openSheet(r){
+  lastFocus=document.activeElement;
+  const o=owner(r);
+  $('panel').innerHTML=`<div class="grab"></div><button class="close" id="cl" aria-label="Sluiten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  ${cover(r,'big',1)}</div>
+  <h3 id="dt">${esc(r.t)}</h3><p class="ar">${esc(r.a)}</p>
+  <div class="facts">${r.y?`<span class="chip">${r.y}</span>`:''}${r.lab?`<span class="chip">${esc(r.lab)}</span>`:''}${r.fmt?`<span class="chip">${esc(r.fmt)}</span>`:''}${r.styles.map(s=>`<span class="chip">${esc(s)}</span>`).join('')}</div>
+  <div class="row"><b>Van</b><div class="mini" role="radiogroup" aria-label="Eigenaar" id="ow">${['David','Quinten'].map(p=>`<button role="radio" data-v="${p}" aria-checked="${o===p}">${p}</button>`).join('')}</div></div>
+  <div class="row"><b id="xl">Kerstplaat</b><button class="sw" role="switch" id="xs" aria-labelledby="xl" aria-checked="${isX(r)}"></button></div>
+  <div class="row"><b id="dl">Disneyplaat</b><button class="sw" role="switch" id="ds" aria-labelledby="dl" aria-checked="${isD(r)}"></button></div>
+  <div class="acts"><button class="btn p" id="pl">Leg op</button><a class="btn" href="https://www.discogs.com/release/${r.id}" target="_blank" rel="noopener">Op Discogs</a></div>`;
+  $('sheet').hidden=false;document.body.style.overflow='hidden';$('cl').focus();
+  $('cl').onclick=closeSheet;
+  $('pl').onclick=()=>{closeSheet();play(r);if(innerWidth<900)scrollTo({top:0,behavior:'smooth'})};
+  $('ow').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;
+    if(OWNER.get(r.id)===b.dataset.v)delete ownFix[r.id];else ownFix[r.id]=b.dataset.v;store.set('own',ownFix);
+    for(const x of $('ow').children)x.setAttribute('aria-checked',x===b);renderAll();if(cur&&cur.id===r.id)showPick(r)};
+  $('ds').onclick=()=>{const v=!isD(r);if(v===!!r.autoD)delete dFix[r.id];else dFix[r.id]=v;store.set('dfix',dFix);
+    $('ds').setAttribute('aria-checked',v);renderAll();if(cur&&cur.id===r.id)showPick(r)};
+  $('xs').onclick=()=>{const v=!isX(r);if(v===r.autoX)delete xmFix[r.id];else xmFix[r.id]=v;store.set('xmfix',xmFix);
+    $('xs').setAttribute('aria-checked',v);renderAll();if(cur&&cur.id===r.id)showPick(r)};
+}
+function closeSheet(){$('sheet').hidden=true;document.body.style.overflow='';lastFocus&&lastFocus.focus&&lastFocus.focus()}
+
+$('scrim').onclick=closeSheet;
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('sheet').hidden)closeSheet()});
+$('grid').onclick=e=>{const b=e.target.closest('[data-id]');if(b){const r=recs.find(x=>x.id===+b.dataset.id);r&&openSheet(r)}};
+$('tabs').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;tab=b.dataset.t;store.set('tab',tab);renderTabs();renderGrid()};
+$('segWho').onclick=e=>{const b=e.target.closest('[data-v]');if(!b||busy)return;who=b.dataset.v;store.set('who',who);renderOpts()};
+$('segD').onclick=e=>{const b=e.target.closest('[data-v]');if(!b||busy)return;dm=b.dataset.v;store.set('dm',dm);renderOpts()};
+$('segX').onclick=e=>{const b=e.target.closest('[data-v]');if(!b||busy)return;xm=b.dataset.v;store.set('xm',xm);renderOpts()};
+$('go').onclick=shuffle;$('refresh').onclick=load;
+$('q').oninput=renderGrid;
+const so=store.get('sort','a');$('sort').value=so;$('sort').onchange=()=>{store.set('sort',$('sort').value);renderGrid()};
+$('grid').innerHTML=Array.from({length:12},()=>'<div class="skel"><div class="cv"></div></div>').join('');
+renderOpts();load();
+}
+</script>
+</body>
+</html>
